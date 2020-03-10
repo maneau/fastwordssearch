@@ -28,84 +28,59 @@ public class WordTrie {
         }
     }
 
-    public List<String> parseText(String text) {
+    public List<MatchToken> parseText(String text) {
         if (isEmpty(text)) {
             return emptyList();
         }
-        if (isIgnoreCase) {
-            return parseText(nodes, text.toLowerCase());
-        } else {
-            return parseText(nodes, text);
+        long start = 0;
+        if (LOG.isInfoEnabled()) {
+            LOG.debug("Starting parsing text of {} characters", text.length());
+            start = System.currentTimeMillis();
         }
+        if (isIgnoreCase) {
+            text = text.toLowerCase();
+        }
+        Matcher matcher = Pattern.compile(regexpTokenSansHtml).matcher(text);
+        List<MatchToken> tokens = parseText(nodes, matcher, -1, 0, text);
+
+        if (LOG.isInfoEnabled()) {
+            long end = System.currentTimeMillis();
+            LOG.info("finish parsing text of {} characters and {} keywords in {} ms", text.length(), this.numberOfKeywords, (end - start));
+        }
+        return tokens;
     }
 
     public long size() {
         return numberOfKeywords;
     }
 
-    private List<String> parseText(Map<String, Map> node, String text) {
-        List<String> matchList = new ArrayList<>();
+    private List<MatchToken> parseText(final Map<String, Map> node, final Matcher matcher, final int matchStartPos, int currentPos, final String text) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("searching at {} position with match started at {} in {}", currentPos, matchStartPos, text.substring(currentPos));
+        }
+        List<MatchToken> matchList = new ArrayList<>();
 
-        LOG.debug("search > {}", text);
-        if (isEmpty(text)) {
-            return matchList;
-        }
+        if (matcher.find(currentPos)) {
+            final int endPos = matcher.end();
+            final int startPos = matcher.start();
+            final String currentWord = text.substring(startPos, endPos);
 
-        Matcher matcher = Pattern.compile(regexpTokenSansHtml).matcher(text);
-        if (!matcher.find()) {
-            return matchList;
+            Map<String, Map> subNode = node.get(currentWord);
+            if (subNode != null && subNode.get(END) != null) {
+                //nous sommes en fin de branche
+                String matchStr = (String) subNode.get(END).keySet().iterator().next();
+                LOG.info("find '{}' at ({},{}) position", matchStr, matchStartPos, endPos);
+                matchList.add(new MatchToken(matchStartPos, endPos, matchStr));
+                return matchList;
+            } else if (subNode != null) {
+                //Search descending in the tree
+                matchList.addAll(parseText(subNode, matcher, startPos, endPos, text));
+            }
+            if (matchStartPos == -1) {
+                //Search the next word only if we are on the 1st level of searching
+                matchList.addAll(parseText(nodes, matcher, -1, endPos, text));
+            }
         }
-
-        int indexFinMot = matcher.end();
-        final String currentWord = text.substring(matcher.start(), matcher.end());
-
-        String restOfPhrase = null;
-        if (indexFinMot < text.length()) {
-            restOfPhrase = text.substring(indexFinMot);
-        }
-        Map<String, Map> subNode = node.get(currentWord);
-        if (subNode != null && subNode.get(END) != null) {
-            //nous sommes en fin de branche
-            String matchStr = (String) subNode.get(END).keySet().iterator().next();
-            LOG.info("trouve > {}", matchStr);
-            matchList.add(matchStr);
-        } else if (subNode != null) {
-            //on descend dans l'arbre
-            matchList.addAll(parseText(subNode, restOfPhrase));
-        }
-        //on passe on mot suivant
-        matchList.addAll(parseText(node, restOfPhrase));
-        return matchList;
-    }
-
-    private List<String> parseTextWithSpace(Map<String, Map> node, String text) {
-        List<String> matchList = new ArrayList<>();
-
-        LOG.debug("search > {}", text);
-        if (isEmpty(text)) {
-            return emptyList();
-        }
-        int indexFinMot = text.indexOf(" ");
-        if (indexFinMot == -1) {
-            indexFinMot = text.length();
-        }
-        String currentWord = text.substring(0, indexFinMot);
-        String restOfPhrase = null;
-        if (indexFinMot < text.length()) {
-            restOfPhrase = text.substring(indexFinMot + 1);
-        }
-        Map<String, Map> subNode = node.get(currentWord);
-        if (subNode != null && subNode.get(END) != null) {
-            //nous sommes en fin de branche
-            String matchStr = (String) subNode.get(END).keySet().iterator().next();
-            LOG.info("trouve > {}", matchStr);
-            matchList.add(matchStr);
-        } else if (subNode != null) {
-            //on descend dans l'arbre
-            matchList.addAll(parseText(subNode, restOfPhrase));
-        }
-        //on passe on mot suivant
-        matchList.addAll(parseText(node, restOfPhrase));
         return matchList;
     }
 
