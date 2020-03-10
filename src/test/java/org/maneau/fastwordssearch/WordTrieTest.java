@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Scanner;
 
 import static org.junit.Assert.*;
+import static org.maneau.fastwordssearch.TestUtils.toStringArray;
 
 public class WordTrieTest {
     private static final Logger LOG = LoggerFactory.getLogger(BenchTest.class);
-    private String wikipediaHtml = loadTextFile("/wikipedia.html");
+    private String wikipediaHtml = TestUtils.loadTextFile("/wikipedia.html");
 
     @Test
     public void addKeywords_add_2_levels() {
@@ -116,29 +117,5 @@ public class WordTrieTest {
         assertEquals(2, tokens.size());
         assertEquals(new MatchToken(8,21,"golden hammer"), tokens.get(0));
         assertEquals(new MatchToken(61,79,"analysis paralysis"), tokens.get(1));
-    }
-
-    private String[] toStringArray(List<MatchToken> matchTokens) {
-        String[] arrayStr = new String[matchTokens.size()];
-        for (int i = 0; i < matchTokens.size(); i++) {
-            arrayStr[i] = matchTokens.get(i).getKeyword();
-        }
-        return arrayStr;
-    }
-
-    private String loadTextFile(String fileName) {
-        StringBuilder sbText = new StringBuilder();
-
-        InputStream inputStream = this.getClass().getResourceAsStream(fileName);
-        if (inputStream == null) {
-            LOG.error("File not found " + fileName);
-            return null;
-        }
-        try (Scanner scanner = new Scanner(inputStream)) {
-            while (scanner.hasNext()) {
-                sbText.append(scanner.nextLine()).append('\n');
-            }
-        }
-        return sbText.toString();
     }
 }

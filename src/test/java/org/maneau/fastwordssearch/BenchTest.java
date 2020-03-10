@@ -1,24 +1,26 @@
 package org.maneau.fastwordssearch;
 
-import com.carrotsearch.sizeof.RamUsageEstimator;
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 public class BenchTest {
     private static final Logger LOG = LoggerFactory.getLogger(BenchTest.class);
+    private static final List<String> dictionnayOfWords = TestUtils.loadFirstNameFile();
+    private static final Integer[] trieSizes = {100, 1000, 10000, 100000};
+    private static final int NB_SEARCH = 100;
+    private static final String[] keywords = {"Analysis paralysis", "Bicycle shed", "Stovepipe or Silos", "Vendor lock-in", "Smoke and mirrors", "Copy and paste programming", "Golden hammer"};
+    private static final String wikipediaHtml = TestUtils.loadTextFile("/wikipedia.html");
     private Random rand = new Random();
-    private List<String> dictionnayOfWords = loadFirstNameFile();
-    private Integer[] trieSizes = {100, 1000, 10000, 100000};
-    private String[] keywords = {"Analysis paralysis", "Bicycle shed", "Stovepipe or Silos", "Vendor lock-in", "Smoke and mirrors", "Copy and paste programming", "Golden hammer"};
-    private String wikipediaHtml = loadTextFile("/wikipedia.html");
 
     @Test
     public void testLoadFastWordSearch() {
@@ -31,18 +33,23 @@ public class BenchTest {
             LOG.info("Using WordTrie inject bench of {} elements in {}ms stored in {}",
                     nb,
                     (end - start),
-                    RamUsageEstimator.humanSizeOf(wordTrie));
+                    -1);//RamUsageEstimator.humanSizeOf(wordTrie));
 
             //Searching part
             start = System.currentTimeMillis();
-            List<MatchToken> tokens = wordTrie.parseText(wikipediaHtml);
+            List<MatchToken> tokens = null;
+
+            for (int i = 0; i < NB_SEARCH; i++) {
+                tokens = wordTrie.parseText(wikipediaHtml);
+                assertEquals(7, tokens.size());
+            }
             end = System.currentTimeMillis();
             LOG.info("Using WordTrie search find {} elements in {}ms with dictionnary of {} elements",
                     tokens.size(),
-                    (end - start),
+                    (end - start) / NB_SEARCH,
                     nb);
+            System.out.println(TestUtils.toString(tokens));
         }
-
     }
 
     @Test
@@ -54,15 +61,20 @@ public class BenchTest {
             LOG.info("Using aho-corrasick inject bench of {} elements in {}ms stored in {}",
                     nb,
                     (end - start),
-                    RamUsageEstimator.humanSizeOf(trie));
+                    -1);//RamUsageEstimator.humanSizeOf(trie));
 
             //Searching part
             start = System.currentTimeMillis();
-            Collection<Emit> tokens = trie.parseText(wikipediaHtml);
+            Collection<Emit> tokens = null;
+
+            for (int i = 0; i < NB_SEARCH; i++) {
+                tokens = trie.parseText(wikipediaHtml);
+                assertEquals(16, tokens.size());
+            }
             end = System.currentTimeMillis();
             LOG.info("Using aho-corrasick search find {} elements in {}ms with dictionnary of {} elements",
                     tokens.size(),
-                    (end - start),
+                    (end - start) / NB_SEARCH,
                     nb);
         }
     }
@@ -95,38 +107,5 @@ public class BenchTest {
         sb.append(" ");
         sb.append(dictionnayOfWords.get(rand.nextInt(dictionnayOfWords.size())));
         return sb.toString();
-    }
-
-    private List<String> loadFirstNameFile() {
-        String fileName = "/firstname.lst";
-        List<String> keywords = new ArrayList<String>();
-
-        InputStream inputStream = this.getClass().getResourceAsStream(fileName);
-        if (inputStream == null) {
-            LOG.error("File not found " + fileName);
-            return null;
-        }
-        try (Scanner scanner = new Scanner(inputStream)) {
-            while (scanner.hasNext()) {
-                keywords.add(scanner.nextLine());
-            }
-        }
-        return keywords;
-    }
-
-    private String loadTextFile(String fileName) {
-        StringBuilder sbText = new StringBuilder();
-
-        InputStream inputStream = this.getClass().getResourceAsStream(fileName);
-        if (inputStream == null) {
-            LOG.error("File not found " + fileName);
-            return null;
-        }
-        try (Scanner scanner = new Scanner(inputStream)) {
-            while (scanner.hasNext()) {
-                sbText.append(scanner.nextLine()).append('\n');
-            }
-        }
-        return sbText.toString();
     }
 }

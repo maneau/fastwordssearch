@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -41,8 +39,9 @@ public class WordTrie {
         if (isIgnoreCase) {
             text = text.toLowerCase();
         }
-        Matcher matcher = Pattern.compile(regexpTokenSansHtml).matcher(text);
-        List<MatchToken> tokens = parseText(nodes, matcher, -1, 0, text);
+        WordTokenizer tokenizer = new WordTokenizer(text);
+        //Matcher matcher = Pattern.compile(regexpTokenSansHtml).matcher(text);
+        List<MatchToken> tokens = parseText(nodes, tokenizer, -1, 0, text);
 
         if (LOG.isDebugEnabled()) {
             long end = System.currentTimeMillis();
@@ -55,7 +54,7 @@ public class WordTrie {
         return numberOfKeywords;
     }
 
-    private List<MatchToken> parseText(final Map<String, Map> node, final Matcher matcher, final int matchStartPos, int currentPos, final String text) {
+    private List<MatchToken> parseText(final Map<String, Map> node, final WordTokenizer matcher, final int matchStartPos, int currentPos, final String text) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("parseText at {} position with match started at {} in {}", currentPos, matchStartPos, text.substring(currentPos));
         }
@@ -87,7 +86,7 @@ public class WordTrie {
         return isWordFounded(subNode) && isWordFounded(subNode.get(END));
     }
 
-    private List<MatchToken> subParseText(final Map<String, Map> node, final Matcher matcher, final int matchStartPos, int currentPos, final String text) {
+    private List<MatchToken> subParseText(final Map<String, Map> node, final WordTokenizer matcher, final int matchStartPos, int currentPos, final String text) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("subParseText at {} position with match started at {} in {}", currentPos, matchStartPos, text.substring(currentPos));
         }
