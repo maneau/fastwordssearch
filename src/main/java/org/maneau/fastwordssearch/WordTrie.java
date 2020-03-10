@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
 public class WordTrie {
@@ -33,7 +34,7 @@ public class WordTrie {
             return emptyList();
         }
         long start = 0;
-        if (LOG.isInfoEnabled()) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("Starting parsing text of {} characters", text.length());
             start = System.currentTimeMillis();
         }
@@ -43,9 +44,9 @@ public class WordTrie {
         Matcher matcher = Pattern.compile(regexpTokenSansHtml).matcher(text);
         List<MatchToken> tokens = parseText(nodes, matcher, -1, 0, text);
 
-        if (LOG.isInfoEnabled()) {
+        if (LOG.isDebugEnabled()) {
             long end = System.currentTimeMillis();
-            LOG.info("finish parsing text of {} characters and {} keywords in {} ms", text.length(), this.numberOfKeywords, (end - start));
+            LOG.debug("finish parsing text of {} characters and {} keywords in {} ms", text.length(), this.numberOfKeywords, (end - start));
         }
         return tokens;
     }
@@ -56,32 +57,65 @@ public class WordTrie {
 
     private List<MatchToken> parseText(final Map<String, Map> node, final Matcher matcher, final int matchStartPos, int currentPos, final String text) {
         if (LOG.isTraceEnabled()) {
-            LOG.trace("searching at {} position with match started at {} in {}", currentPos, matchStartPos, text.substring(currentPos));
+            LOG.trace("parseText at {} position with match started at {} in {}", currentPos, matchStartPos, text.substring(currentPos));
         }
-        List<MatchToken> matchList = new ArrayList<>();
+        List<MatchToken> tokens = new ArrayList<>();
 
-        if (matcher.find(currentPos)) {
+        while(matcher.find(currentPos)) {
+            final int endPos = matcher.end();
+            final int startPos = matcher.start();
+            final String currentWord = text.substring(startPos, endPos);
+
+            LOG.debug("parseText {}", currentWord);
+
+            Map<String, Map> subNode = node.get(currentWord);
+            if (isEndOfBranch(subNode)) {
+                //nous sommes en fin de branche
+                String matchStr = getKeywordFromNode(subNode);
+                LOG.debug("find '{}' at ({},{}) position", matchStr, matchStartPos, endPos);
+                tokens.add(new MatchToken(matchStartPos, endPos, matchStr));
+            } else if (isWordFounded(subNode)) {
+                //Search descending in the tree
+                tokens.addAll(subParseText(subNode, matcher, startPos, endPos, text));
+            }
+            currentPos = endPos;
+        }
+        return tokens;
+    }
+
+    private boolean isEndOfBranch(Map<String, Map> subNode) {
+        return isWordFounded(subNode) && isWordFounded(subNode.get(END));
+    }
+
+    private List<MatchToken> subParseText(final Map<String, Map> node, final Matcher matcher, final int matchStartPos, int currentPos, final String text) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("subParseText at {} position with match started at {} in {}", currentPos, matchStartPos, text.substring(currentPos));
+        }
+        if(matcher.find(currentPos)) {
             final int endPos = matcher.end();
             final int startPos = matcher.start();
             final String currentWord = text.substring(startPos, endPos);
 
             Map<String, Map> subNode = node.get(currentWord);
-            if (subNode != null && subNode.get(END) != null) {
-                //nous sommes en fin de branche
-                String matchStr = (String) subNode.get(END).keySet().iterator().next();
-                LOG.info("find '{}' at ({},{}) position", matchStr, matchStartPos, endPos);
-                matchList.add(new MatchToken(matchStartPos, endPos, matchStr));
-                return matchList;
-            } else if (subNode != null) {
+            if (isEndOfBranch(subNode)) {
+                //end of branch, we got a result
+                String matchStr = getKeywordFromNode(subNode);
+                LOG.debug("find '{}' at ({},{}) position", matchStr, matchStartPos, endPos);
+                return asList(new MatchToken(matchStartPos, endPos, matchStr));
+            } else if (isWordFounded(subNode)) {
                 //Search descending in the tree
-                matchList.addAll(parseText(subNode, matcher, startPos, endPos, text));
-            }
-            if (matchStartPos == -1) {
-                //Search the next word only if we are on the 1st level of searching
-                matchList.addAll(parseText(nodes, matcher, -1, endPos, text));
+                return subParseText(subNode, matcher, startPos, endPos, text);
             }
         }
-        return matchList;
+        return emptyList();
+    }
+
+    private boolean isWordFounded(Map<String, Map> subNode) {
+        return subNode != null;
+    }
+
+    private String getKeywordFromNode(Map<String, Map> currentNode) {
+        return (String) currentNode.get(END).keySet().iterator().next();
     }
 
     private boolean isNotEmpty(String word) {
