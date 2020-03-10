@@ -18,12 +18,12 @@ import static org.junit.Assert.assertEquals;
 @Ignore
 public class BenchTest {
     private static final Logger LOG = LoggerFactory.getLogger(BenchTest.class);
-    private static final List<String> dictionnayOfWords = TestUtils.loadFirstNameFile();
+    private static final List<String> dictionaryOfWords = TestUtils.loadFirstNameFile();
     private static final Integer[] trieSizes = {100, 1000, 10000, 100000, 1000000};
     private static final int NB_SEARCH = 100;
     private static final String[] keywords = {"Analysis paralysis", "Bicycle shed", "Stovepipe or Silos", "Vendor lock-in", "Smoke and mirrors", "Copy and paste programming", "Golden hammer"};
     private static final String wikipediaHtml = TestUtils.loadTextFile("/wikipedia.html");
-    private Random rand = new Random();
+    private final Random rand = new Random();
 
     @Test
     public void testLoadFastWordSearch() {
@@ -52,7 +52,7 @@ public class BenchTest {
                     NB_SEARCH,
                     (end - start),
                     nb);
-            System.out.println(TestUtils.toString(tokens));
+            LOG.info("tokens : {}", TestUtils.toString(tokens));
         }
     }
 
@@ -106,11 +106,12 @@ public class BenchTest {
         return builder.build();
     }
 
+    @SuppressWarnings({"ConstantConditions", "StringBufferReplaceableByString"})
     private String generateRandomKeyword() {
         StringBuilder sb = new StringBuilder();
-        sb.append(dictionnayOfWords.get(rand.nextInt(dictionnayOfWords.size())));
+        sb.append(dictionaryOfWords.get(rand.nextInt(dictionaryOfWords.size())));
         sb.append(" ");
-        sb.append(dictionnayOfWords.get(rand.nextInt(dictionnayOfWords.size())));
+        sb.append(dictionaryOfWords.get(rand.nextInt(dictionaryOfWords.size())));
         return sb.toString();
     }
 }

@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.maneau.fastwordssearch.TestUtils.assertTokenEquals;
 
 public class ReadmeTest {
 
@@ -16,7 +17,7 @@ public class ReadmeTest {
 
         List<MatchToken> tokens = trie.parseText("text where searching some words SOME WORDS dont't");
         assertEquals(1, tokens.size());
-        assertEquals(new MatchToken(21,31,"some words"), tokens.get(0));
+        assertTokenEquals(new MatchToken(21,31,"some words"), tokens.get(0));
     }
 
     @Test
@@ -28,7 +29,7 @@ public class ReadmeTest {
         List<MatchToken> tokens = trie.parseText("text where searching some Words");
 
         assertEquals(1, tokens.size());
-        assertEquals(new MatchToken(21,31,"Some wordS"), tokens.get(0));
+        assertTokenEquals(new MatchToken(21,31,"Some wordS"), tokens.get(0));
     }
 
     @Test
@@ -41,8 +42,8 @@ public class ReadmeTest {
 
         List<MatchToken> tokens = trie.parseText("text where searching some words");
         assertEquals(2, tokens.size());
-        assertEquals(new MatchToken(0,10,"text where"), tokens.get(0));
-        assertEquals(new MatchToken(21,31,"some words"), tokens.get(1));
+        assertTokenEquals(new MatchToken(0,10,"text where"), tokens.get(0));
+        assertTokenEquals(new MatchToken(21,31,"some words"), tokens.get(1));
     }
 
     @Test
@@ -53,8 +54,8 @@ public class ReadmeTest {
 
         List<MatchToken> tokens = trie.parseText("this is some-words, and some...words as well");
         assertEquals(2, tokens.size());
-        assertEquals(new MatchToken(8,18,"some words"), tokens.get(0));
-        assertEquals(new MatchToken(24,36,"some words"), tokens.get(1));
+        assertTokenEquals(new MatchToken(8,18,"some words"), tokens.get(0));
+        assertTokenEquals(new MatchToken(24,36,"some words"), tokens.get(1));
     }
 
     @Test
@@ -65,6 +66,6 @@ public class ReadmeTest {
 
         List<MatchToken> tokens = trie.parseText("<p class=\"some words\">some <b>words</b></p>");
         assertEquals(1, tokens.size());
-        assertEquals(new MatchToken(22,35,"some words"), tokens.get(0));
+        assertTokenEquals(new MatchToken(22,35,"some words"), tokens.get(0));
     }
 }

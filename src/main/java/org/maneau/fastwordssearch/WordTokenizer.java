@@ -1,13 +1,14 @@
 package org.maneau.fastwordssearch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WordTokenizer {
 
     private static final String AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final String text;
-    private static boolean[] aZtab = new boolean[255];
+    private static final boolean[] isAsciiTab = new boolean[255];
 
     private int pos = 0;
     private int start = 0;
@@ -15,13 +16,11 @@ public class WordTokenizer {
     private boolean openScript = false;
 
     static {
-        for (int i = 0; i < aZtab.length; i++) {
-            aZtab[i] = false;
-        }
+        Arrays.fill(isAsciiTab, false);
         String az = AZ.toLowerCase();
         for (int i = 0; i < AZ.length(); i++) {
-            aZtab[AZ.charAt(i)] = true;
-            aZtab[az.charAt(i)] = true;
+            isAsciiTab[AZ.charAt(i)] = true;
+            isAsciiTab[az.charAt(i)] = true;
         }
     }
 
@@ -44,7 +43,7 @@ public class WordTokenizer {
                 openScript = false;
             }
             if(!openScript) {
-                if (c < 255 && aZtab[c]) {
+                if (c < 255 && isAsciiTab[c]) {
                     return pos;
                 }
             }
@@ -55,7 +54,7 @@ public class WordTokenizer {
     private int getNextNonAsciiPos() {
         for (; pos < text.length(); pos++) {
             char c = text.charAt(pos);
-            if (c < 255 && !aZtab[c]) {
+            if (c < 255 && !isAsciiTab[c]) {
                 return pos;
             }
         }

@@ -22,7 +22,7 @@ public class MatchToken {
         final MatchToken oToken = (MatchToken) o;
         return start == oToken.start
                 && end == oToken.end
-                && Objects.equals(keyword, oToken.keyword) ;
+                && Objects.equals(keyword, oToken.keyword);
     }
 
     @Override
@@ -30,11 +30,12 @@ public class MatchToken {
         return Objects.hash(start, end, keyword);
     }
 
-    public String getKeyword() {
-        return this.keyword;
+    @Override
+    public String toString() {
+        return String.format("['%s' at (%s,%s)]", this.keyword, this.start, this.end);
     }
 
-    public String toString() {
-        return super.toString() + "=" + this.keyword;
+    public String getKeyword() {
+        return this.keyword;
     }
 }

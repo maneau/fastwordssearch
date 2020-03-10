@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 public class TestUtils {
     private static final Logger LOG = LoggerFactory.getLogger(BenchTest.class);
 
@@ -29,7 +32,7 @@ public class TestUtils {
 
     public static List<String> loadFirstNameFile() {
         String fileName = "/firstname.lst";
-        List<String> keywords = new ArrayList<String>();
+        List<String> keywords = new ArrayList<>();
 
         InputStream inputStream = LOG.getClass().getResourceAsStream(fileName);
         if (inputStream == null) {
@@ -55,9 +58,31 @@ public class TestUtils {
 
     public static String toString(List<MatchToken> matchTokens) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < matchTokens.size(); i++) {
-            sb.append(matchTokens.get(i).getKeyword()).append(", ");
+        for (MatchToken matchToken : matchTokens) {
+            sb.append(matchToken.getKeyword()).append(", ");
         }
         return sb.toString();
+    }
+
+    public static void assertTokenEquals(MatchToken expectedToken, MatchToken token) {
+        if (!expectedToken.equals(token)) {
+            fail(String.format("expected : %s but found %s", expectedToken.toString(), token.toString()));
+        }
+    }
+
+    public static void assertListEquals(List<Object> expectedList, List<String> actualList) {
+        assertNotNull(actualList);
+
+        for (int i = 0; i < expectedList.size() && i < actualList.size(); i++) {
+            if (!expectedList.get(i).equals(actualList.get(i))) {
+                fail(String.format("expected '%s' but found '%s'", expectedList.get(i).toString(), actualList.get(i)));
+            }
+        }
+        if (expectedList.size() > actualList.size()) {
+            fail(String.format("expected '%s' not present in actual", expectedList.get(expectedList.size() - 1)));
+        }
+        if (expectedList.size() < actualList.size()) {
+            fail(String.format("actual '%s' not present in expected", actualList.get(actualList.size() - 1)));
+        }
     }
 }

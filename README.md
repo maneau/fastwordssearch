@@ -52,7 +52,7 @@ WordTrie trie = WordTrie.builder()
 
 List<MatchToken> tokens = trie.parseText("text where searching some words SOME WORDS dont't");
 assertEquals(1, tokens.size());
-assertEquals(new MatchToken(21,31,"some words"), tokens.get(0));
+assertTokenEquals(new MatchToken(21,31,"some words"), tokens.get(0));
 ```
 
 It while return "some words" and it place.
@@ -68,7 +68,7 @@ WordTrie trie = WordTrie.builder().ignoreCase()
 List<MatchToken> tokens = trie.parseText("text where searching some Words");
 
 assertEquals(1, tokens.size());
-assertEquals(new MatchToken(21,31,"Some wordS"), tokens.get(0));
+assertTokenEquals(new MatchToken(21,31,"Some wordS"), tokens.get(0));
 ```
 
 ### Still can add keywords
@@ -84,7 +84,7 @@ trie.addKeyword("text where");
 
 List<MatchToken> tokens = trie.parseText("text where searching some words");
 assertEquals(1, tokens.size());
-assertEquals(new MatchToken(8,21,"some words"), tokens.get(0));
+assertTokenEquals(new MatchToken(8,21,"some words"), tokens.get(0));
 ```
 
 ### Ignoring special characters and ponctuation
@@ -98,8 +98,8 @@ WordTrie trie = WordTrie.builder()
 
 List<MatchToken> tokens = trie.parseText("this is some-words, and some...words as well");
 assertEquals(2, tokens.size());
-assertEquals(new MatchToken(8,18,"some words"), tokens.get(0));
-assertEquals(new MatchToken(24,36,"some words"), tokens.get(1));
+assertTokenEquals(new MatchToken(8,18,"some words"), tokens.get(0));
+assertTokenEquals(new MatchToken(24,36,"some words"), tokens.get(1));
 ```
 
 ### Ignoring html tags
@@ -113,7 +113,7 @@ WordTrie trie = WordTrie.builder()
 
 List<MatchToken> tokens = trie.parseText("<p class=\"some words\">some <b>words</b></p>");
 assertEquals(1, tokens.size());
-assertEquals(new MatchToken(22,35,"some words"), tokens.get(0));
+assertTokenEquals(new MatchToken(22,35,"some words"), tokens.get(0));
 ```
 
 _**Note** : the Tokenizer only consider ASCII words neither numbers or special char `(-_/)`_ 

@@ -1,53 +1,66 @@
 package org.maneau.fastwordssearch;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.util.List;
-import java.util.Scanner;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
-import static org.maneau.fastwordssearch.TestUtils.toStringArray;
+import static org.maneau.fastwordssearch.TestUtils.*;
 
 public class WordTrieTest {
-    private static final Logger LOG = LoggerFactory.getLogger(BenchTest.class);
-    private String wikipediaHtml = TestUtils.loadTextFile("/wikipedia.html");
+    private static final String wikipediaHtml = TestUtils.loadTextFile("/wikipedia.html");
+    private static final String basicHtmlText = "<ul><li>golden hammer</li><li>analysis not paralysis</li><li>analysis paralysis</li></ul>";
+    private static final MatchToken ANALYSIS_PARALYSIS = new MatchToken(61, 79, "analysis paralysis");
+    private static final MatchToken GOLDEN_HAMMER = new MatchToken(8, 21, "golden hammer");
 
     @Test
     public void addKeywords_add_2_levels() {
-        WordTrie dico = new WordTrie();
-        dico.addKeyword("manuel vals");
-        dico.addKeyword("manuel petit");
-        dico.addKeyword("");
+        WordTrie trie = new WordTrie();
+        trie.addKeyword("manuel vals");
+        trie.addKeyword("manuel petit");
+        trie.addKeyword("");
 
-        assertNotNull(dico.getNode("manuel"));
-        assertEquals(2, dico.getNode("manuel").size());
-        assertEquals(2, dico.size());
+        assertNotNull(trie.getNode("manuel"));
+        assertEquals(2, trie.getNode("manuel").size());
+        assertEquals(2, trie.size());
 
-        dico.addKeyword("manuel petit");
-        assertEquals(2, dico.size());
+        trie.addKeyword("manuel petit");
+        assertEquals(2, trie.size());
     }
 
     @Test
-    public void search_basic() throws Exception {
-        WordTrie dico = WordTrie.builder()
+    public void search_basic_1_level() {
+        WordTrie trie = WordTrie.builder()
+                .addKeyword("manuel")
+                .build();
+
+        assertEquals(1, trie.parseText("ici eric petit manuel nouveau").size());
+        assertTokenEquals(
+                new MatchToken(15, 21, "manuel"),
+                trie.parseText("ici eric petit manuel nouveau").get(0));
+    }
+
+    @Test
+    public void search_basic_2_and_3_level() {
+        WordTrie trie = WordTrie.builder()
                 .addKeyword("manuel vals")
                 .addKeyword("manuel petit")
                 .addKeyword("jean emmanuel chain")
                 .addKeyword("eric petit")
                 .build();
 
-        assertNotNull(dico.getNode("manuel"));
-        assertEquals(1, dico.parseText("ici eric petit manuel nouveau").size());
-        assertEquals(2, dico.parseText("ici eric petit manuel nouveau jean emmanuel chain fin").size());
-        assertEquals(2, dico.parseText("ici eric petit manuel nouveau jean emmanuel chain").size());
+        assertNotNull(trie.getNode("manuel"));
+        assertEquals(1, trie.parseText("ici eric petit manuel nouveau").size());
+        assertEquals(2, trie.parseText("ici eric petit manuel nouveau jean emmanuel chain fin").size());
+        assertEquals(2, trie.parseText("ici eric petit manuel nouveau jean emmanuel chain").size());
     }
 
     @Test
-    public void parseText_in_large_html_page() throws Exception {
-        WordTrie dico = WordTrie.builder().ignoreCase()
+    public void parseText_in_large_html_page() {
+        WordTrie trie = WordTrie.builder().ignoreCase()
                 .addKeyword("Analysis paralysis")
                 .addKeyword("Bicycle shed")
                 .addKeyword("Stovepipe or Silos")
@@ -57,65 +70,93 @@ public class WordTrieTest {
                 .addKeyword("Golden hammer")
                 .build();
 
-        List<MatchToken> tokens = dico.parseText(wikipediaHtml);
+        List<MatchToken> tokens = trie.parseText(wikipediaHtml);
         assertEquals(7, tokens.size());
-        assertEquals(new MatchToken(1550,1568,"Analysis paralysis"), tokens.get(0));
-        assertEquals(new MatchToken(7115,7133,"Analysis paralysis"), tokens.get(1));
-        assertEquals(new MatchToken(7372,7384,"Bicycle shed"), tokens.get(2));
-        assertEquals(new MatchToken(10105,10113,"Stovepipe or Silos"), tokens.get(3));
-        assertEquals(new MatchToken(12429,12440,"Smoke and mirrors"), tokens.get(4));
-        assertEquals(new MatchToken(24334,24351,"Copy and paste programming"), tokens.get(5));
-        assertEquals(new MatchToken(25136,25149,"Golden hammer"), tokens.get(6));
+        assertTokenEquals(new MatchToken(1571, 1589, "Analysis paralysis"), tokens.get(0));
+        assertTokenEquals(new MatchToken(7136, 7154, "Analysis paralysis"), tokens.get(1));
+        assertTokenEquals(new MatchToken(7393, 7405, "Bicycle shed"), tokens.get(2));
+        assertTokenEquals(new MatchToken(10126, 10134, "Stovepipe or Silos"), tokens.get(3));
+        assertTokenEquals(new MatchToken(12450, 12461, "Smoke and mirrors"), tokens.get(4));
+        assertTokenEquals(new MatchToken(24355, 24372, "Copy and paste programming"), tokens.get(5));
+        assertTokenEquals(new MatchToken(25157, 25170, "Golden hammer"), tokens.get(6));
     }
 
     @Test
-    public void parseText_basic_html() throws Exception {
-        WordTrie dico = WordTrie.builder().ignoreCase()
+    public void parseText_basic_html() {
+        WordTrie trie = WordTrie.builder().ignoreCase()
                 .addKeyword("Analysis paralysis")
                 .build();
 
         String[] expectedKeyWord = {"Analysis paralysis"};
-        assertArrayEquals(expectedKeyWord, toStringArray(dico.parseText("<b>Analysis paralysis</b>")));
-        assertArrayEquals(expectedKeyWord, toStringArray(dico.parseText("<b> Analysis</b> <i>paralysis</i>")));
-        assertTrue(dico.parseText("<p class=\" Analysis paralysis \">Hello</p>").isEmpty());
-        assertTrue(dico.parseText("<!-- Analysis paralysis --> Hello").isEmpty());
+        assertListEquals(asList(expectedKeyWord), asList(toStringArray(trie.parseText("<b>Analysis paralysis</b>"))));
+        assertListEquals(asList(expectedKeyWord), asList(toStringArray(trie.parseText("<b> Analysis</b> <i>paralysis</i>"))));
+        assertTrue(trie.parseText("<p class=\" Analysis paralysis \">Hello</p>").isEmpty());
+        assertTrue(trie.parseText("<!-- Analysis paralysis --> Hello").isEmpty());
     }
 
     @Test
-    public void parseText_basic_html_valid_position() throws Exception {
+    public void parseText_basic_html_valid_position() {
         String basicHtmlText = "<ul><li>golden hammer</li><li>analysis paralysis</li></ul>";
-        WordTrie dico1 = WordTrie.builder().addKeyword("golden hammer").build();
-        WordTrie dico2 = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
+        WordTrie trie1 = WordTrie.builder().addKeyword("golden hammer").build();
+        WordTrie trie2 = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
 
-        List<MatchToken> tokens = dico1.parseText(basicHtmlText);
+        List<MatchToken> tokens = trie1.parseText(basicHtmlText);
         assertEquals(1, tokens.size());
-        assertEquals(new MatchToken(8,21,"golden hammer"), tokens.get(0));
+        assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
 
-        tokens = dico2.parseText(basicHtmlText);
+        tokens = trie2.parseText(basicHtmlText);
         assertEquals(2, tokens.size());
-        assertEquals(new MatchToken(8,21,"golden hammer"), tokens.get(0));
-        assertEquals(new MatchToken(30,48,"analysis paralysis"), tokens.get(1));
+        assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
+        assertTokenEquals(new MatchToken(30, 48, "analysis paralysis"), tokens.get(1));
     }
 
     @Test
-    public void parseText_complexe_html_valid_position() throws Exception {
+    public void parseText_complex_html_valid_position() {
         String basicHtmlText = "<p class=\"golden hammer\">golden not hammer</p><p>golden hammer</p></li><li>analysis not paralysis</li><li>analysis paralysis</li></ul>";
-        WordTrie dico = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
+        WordTrie trie = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
 
-        List<MatchToken> tokens = dico.parseText(basicHtmlText);
+        List<MatchToken> tokens = trie.parseText(basicHtmlText);
         assertEquals(2, tokens.size());
-        assertEquals(new MatchToken(49,62,"golden hammer"), tokens.get(0));
-        assertEquals(new MatchToken(106,124,"analysis paralysis"), tokens.get(1));
+        assertTokenEquals(new MatchToken(49, 62, "golden hammer"), tokens.get(0));
+        assertTokenEquals(new MatchToken(106, 124, "analysis paralysis"), tokens.get(1));
     }
 
     @Test
-    public void parseText_simple_html_valid_position() throws Exception {
-        String basicHtmlText = "<ul><li>golden hammer</li><li>analysis not paralysis</li><li>analysis paralysis</li></ul>";
-        WordTrie dico = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
+    public void parseText_simple_html_valid_position() {
+        WordTrie trie = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
 
-        List<MatchToken> tokens = dico.parseText(basicHtmlText);
+        List<MatchToken> tokens = trie.parseText(basicHtmlText);
         assertEquals(2, tokens.size());
-        assertEquals(new MatchToken(8,21,"golden hammer"), tokens.get(0));
-        assertEquals(new MatchToken(61,79,"analysis paralysis"), tokens.get(1));
+        assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
+        assertTokenEquals(ANALYSIS_PARALYSIS, tokens.get(1));
+    }
+
+    @Test
+    public void addkeywords_test() {
+        String[] keywords = {"golden hammer", "analysis paralysis"};
+        WordTrie trie = WordTrie.builder().build();
+        trie.addKeywords(asList(keywords));
+        List<MatchToken> tokens = trie.parseText(basicHtmlText);
+        assertEquals(2, tokens.size());
+        assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
+        assertTokenEquals(ANALYSIS_PARALYSIS, tokens.get(1));
+    }
+
+    @Test
+    public void isNotEmpty_deal_with_null() {
+        //noinspection ConstantConditions
+        assertFalse(WordTrie.isNotEmpty(null));
+        assertFalse(WordTrie.isNotEmpty(emptyList()));
+        assertTrue(WordTrie.isNotEmpty(singletonList("1")));
+    }
+
+    @Test
+    public void builderAddKeywords_test() {
+        String[] keywords = {"golden hammer", "analysis paralysis"};
+        WordTrie trie = WordTrie.builder().addKeywords(asList(keywords)).build();
+        List<MatchToken> tokens = trie.parseText(basicHtmlText);
+        assertEquals(2, tokens.size());
+        assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
+        assertTokenEquals(ANALYSIS_PARALYSIS, tokens.get(1));
     }
 }
