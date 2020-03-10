@@ -47,7 +47,7 @@ public class WordTrieTest {
 
     @Test
     public void parseText_in_large_html_page() throws Exception {
-        WordTrie dico = WordTrie.builder()
+        WordTrie dico = WordTrie.builder().ignoreCase()
                 .addKeyword("Analysis paralysis")
                 .addKeyword("Bicycle shed")
                 .addKeyword("Stovepipe or Silos")

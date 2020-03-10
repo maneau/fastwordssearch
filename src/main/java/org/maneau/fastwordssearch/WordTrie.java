@@ -214,7 +214,7 @@ public class WordTrie {
 
         public WordTrie build() {
             WordTrie dico = new WordTrie();
-            dico.ignoreCase(true);
+            dico.ignoreCase(ignoreCase);
             for (String keyword : keywords) {
                 dico.addKeyword(keyword);
             }

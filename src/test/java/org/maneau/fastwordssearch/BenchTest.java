@@ -1,7 +1,9 @@
 package org.maneau.fastwordssearch;
 
+import com.carrotsearch.sizeof.RamUsageEstimator;
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +15,11 @@ import java.util.Random;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
+@Ignore
 public class BenchTest {
     private static final Logger LOG = LoggerFactory.getLogger(BenchTest.class);
     private static final List<String> dictionnayOfWords = TestUtils.loadFirstNameFile();
-    private static final Integer[] trieSizes = {100, 1000, 10000, 100000};
+    private static final Integer[] trieSizes = {100, 1000, 10000, 100000, 1000000};
     private static final int NB_SEARCH = 100;
     private static final String[] keywords = {"Analysis paralysis", "Bicycle shed", "Stovepipe or Silos", "Vendor lock-in", "Smoke and mirrors", "Copy and paste programming", "Golden hammer"};
     private static final String wikipediaHtml = TestUtils.loadTextFile("/wikipedia.html");
@@ -33,7 +36,7 @@ public class BenchTest {
             LOG.info("Using WordTrie inject bench of {} elements in {}ms stored in {}",
                     nb,
                     (end - start),
-                    -1);//RamUsageEstimator.humanSizeOf(wordTrie));
+                    RamUsageEstimator.humanSizeOf(wordTrie));
 
             //Searching part
             start = System.currentTimeMillis();
@@ -44,9 +47,10 @@ public class BenchTest {
                 assertEquals(7, tokens.size());
             }
             end = System.currentTimeMillis();
-            LOG.info("Using WordTrie search find {} elements in {}ms with dictionnary of {} elements",
+            LOG.info("Using WordTrie search {} terms in {} docs during {}ms. With a dictionnary containing {} elements",
                     tokens.size(),
-                    (end - start) / NB_SEARCH,
+                    NB_SEARCH,
+                    (end - start),
                     nb);
             System.out.println(TestUtils.toString(tokens));
         }
@@ -58,10 +62,10 @@ public class BenchTest {
             long start = System.currentTimeMillis();
             Trie trie = createNbelementDicoAho(nb);
             long end = System.currentTimeMillis();
-            LOG.info("Using aho-corrasick inject bench of {} elements in {}ms stored in {}",
+            LOG.info("Using aho-corasick inject bench of {} elements in {}ms stored in {}",
                     nb,
                     (end - start),
-                    -1);//RamUsageEstimator.humanSizeOf(trie));
+                    RamUsageEstimator.humanSizeOf(trie));
 
             //Searching part
             start = System.currentTimeMillis();
@@ -72,9 +76,10 @@ public class BenchTest {
                 assertEquals(16, tokens.size());
             }
             end = System.currentTimeMillis();
-            LOG.info("Using aho-corrasick search find {} elements in {}ms with dictionnary of {} elements",
+            LOG.info("Using aho-corasick search {} terms in {} docs during {}ms. With a dictionnary containing {} elements",
                     tokens.size(),
-                    (end - start) / NB_SEARCH,
+                    NB_SEARCH,
+                    (end - start),
                     nb);
         }
     }
