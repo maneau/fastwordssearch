@@ -23,6 +23,8 @@ public class MatchTokenTest {
         assertFalse(token.equals(new MatchToken(2, 3, "keyword")));
         assertFalse(token.equals(new MatchToken(1, 10, "keyword")));
         assertFalse(token.equals(new MatchToken(1, 3, "keywords")));
+        assertTrue(token.equals(token));
+        assertFalse(token.equals(new Object()));
     }
 
     @Test
@@ -33,4 +35,8 @@ public class MatchTokenTest {
         assertNotSame(Objects.hash(1, 4, "keywords"), token.hashCode());
     }
 
+    @Test
+    public void testGetKeyword() {
+        assertEquals("keyword", token.getKeyword());
+    }
 }

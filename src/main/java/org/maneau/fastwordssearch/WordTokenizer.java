@@ -36,19 +36,20 @@ public class WordTokenizer {
 
     private int getNextAsciiPos() {
         for (; pos < text.length(); pos++) {
-            char c = text.charAt(pos);
-            if(c == '<') {
+            final char c = text.charAt(pos);
+            if (c == '<') {
                 openScript = true;
             } else if (openScript && c == '>') {
                 openScript = false;
-            }
-            if(!openScript) {
-                if (c < 255 && isAsciiTab[c]) {
-                    return pos;
-                }
+            } else if (!openScript && isAnAsciiCharacter(c)) {
+                return pos;
             }
         }
         return -1;
+    }
+
+    private boolean isAnAsciiCharacter(char c) {
+        return c < 255 && isAsciiTab[c];
     }
 
     private int getNextNonAsciiPos() {
