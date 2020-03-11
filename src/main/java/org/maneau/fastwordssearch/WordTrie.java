@@ -47,17 +47,18 @@ public class WordTrie {
         return isWordFounded(subNode) && isWordFounded(subNode.get(END));
     }
 
-    public List<MatchToken> parseText(String text) {
-        if (isEmpty(text)) {
+    public List<MatchToken> parseText(final String inputText) {
+        if (isEmpty(inputText)) {
             return emptyList();
         }
         long start = 0;
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Starting parsing text of {} characters", text.length());
+            LOG.debug("Starting parsing text of {} characters", inputText.length());
             start = System.currentTimeMillis();
         }
+        String text = inputText;
         if (isIgnoreCase) {
-            text = text.toLowerCase();
+            text = inputText.toLowerCase();
         }
         WordTokenizer tokenizer = new WordTokenizer(text);
         List<MatchToken> tokens = parseText(nodes, tokenizer, text);

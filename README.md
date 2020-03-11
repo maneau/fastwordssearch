@@ -30,13 +30,13 @@ Can you prouve it ?
 
 Juste launch the BenchTest and you get something like this for a wikipedia html page :
  
-|Dictionary Size | Aho-Corasick memory | FastWordsSearch memory | Aho-Corasick speed | FastWordsSearch speed | 
-| -------------- | ------------------- | ---------------------- | ------------------ | --------------------- |
-| 100            | 274.6 KB            | 69.5 KB                | 191ms /100 docs    | 194ms /100 docs       |
-| 1000           | 2.3 MB              | 676.7 KB               | 127ms /100 docs    | 115ms /100 docs       |
-| 10000          | 18.3 MB             | 6 MB                   | 156ms /100 docs    | 89ms  /100 docs       |
-| 100000         | 135.5 MB            | 48 MB                  | 164ms /100 docs    | 52ms  /100 docs       |
-| 1000000        | 1.1 GB              | 463.6 MB               | 201ms /100 docs    | 46ms  /100 docs       |
+| Dictionary Size | Aho-Corasick memory | FastWordsSearch memory | Aho-Corasick speed | FastWordsSearch speed | 
+| --------------- | ------------------- | ---------------------- | ------------------ | --------------------- |
+| 100             | 274.6 KB            | 69.5 KB                | 191ms /100 docs    | 194ms /100 docs       |
+| 1000            | 2.3 MB              | 676.7 KB               | 127ms /100 docs    | 115ms /100 docs       |
+| 10000           | 18.3 MB             | 6 MB                   | 156ms /100 docs    | 89ms  /100 docs       |
+| 100000          | 135.5 MB            | 48 MB                  | 164ms /100 docs    | 52ms  /100 docs       |
+| 1000000         | 1.1 GB              | 463.6 MB               | 201ms /100 docs    | 46ms  /100 docs       |
 
 for a txt page the result are very similar :
 
