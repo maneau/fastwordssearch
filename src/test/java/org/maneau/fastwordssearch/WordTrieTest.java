@@ -12,7 +12,7 @@ import static org.maneau.fastwordssearch.TestUtils.*;
 
 public class WordTrieTest {
     private static final String wikipediaHtml = loadTextFile("/wikipedia.html");
-    private static final String basicHtmlText = "<ul><li>golden hammer</li><li>analysis not paralysis</li><li>analysis paralysis</li></ul>";
+    private static final String basicHtmlTest = "<ul><li>golden hammer</li><li>analysis not paralysis</li><li>analysis paralysis</li></ul>";
     private static final MatchToken ANALYSIS_PARALYSIS = new MatchToken(61, 79, "analysis paralysis");
     private static final MatchToken GOLDEN_HAMMER = new MatchToken(8, 21, "golden hammer");
 
@@ -38,7 +38,8 @@ public class WordTrieTest {
     public void builderAddKeywords_test() {
         String[] keywords = {"golden hammer", "analysis paralysis"};
         WordTrie trie = WordTrie.builder().addKeywords(asList(keywords)).build();
-        List<MatchToken> tokens = trie.parseText(basicHtmlText);
+        List<MatchToken> tokens = trie.parseText(basicHtmlTest);
+
         assertEquals(2, tokens.size());
         assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
         assertTokenEquals(ANALYSIS_PARALYSIS, tokens.get(1));
@@ -142,7 +143,7 @@ public class WordTrieTest {
     public void parseText_simple_html_valid_position() {
         WordTrie trie = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
 
-        List<MatchToken> tokens = trie.parseText(basicHtmlText);
+        List<MatchToken> tokens = trie.parseText(basicHtmlTest);
         assertEquals(2, tokens.size());
         assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
         assertTokenEquals(ANALYSIS_PARALYSIS, tokens.get(1));
@@ -153,7 +154,8 @@ public class WordTrieTest {
         String[] keywords = {"golden hammer", "analysis paralysis"};
         WordTrie trie = WordTrie.builder().build();
         trie.addKeywords(asList(keywords));
-        List<MatchToken> tokens = trie.parseText(basicHtmlText);
+        List<MatchToken> tokens = trie.parseText(basicHtmlTest);
+
         assertEquals(2, tokens.size());
         assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
         assertTokenEquals(ANALYSIS_PARALYSIS, tokens.get(1));
