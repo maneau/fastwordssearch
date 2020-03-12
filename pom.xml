@@ -6,8 +6,8 @@
     <artifactId>fastwordssearch</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
-    <name>Fast Words Search algorithm</name>
-    <description>Java library for efficient words match against a large set of multiwords keywords</description>
+    <name>Fast Words Search</name>
+    <description>Java library for efficient multi-words keywords searching on a text.</description>
     <inceptionYear>2020</inceptionYear>
 
     <distributionManagement>

@@ -1,26 +1,39 @@
-<Settings Xmlns="Http://Maven.Apache.Org/SETTINGS/1.0.0"
-          Xmlns:Xsi="Http://Www.W3.Org/2001/XMLSchema-Instance"
-          Xsi:SchemaLocation="Http://Maven.Apache.Org/SETTINGS/1.0.0
-                      Http://Maven.Apache.Org/Xsd/Settings-1.0.0.Xsd">
-    <Servers>
-        <Server>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <servers>
+        <server>
             <id>github</id>
             <username>maneau</username>
-            <Password>${env.GITHUB_TOKEN}</Password>
-        </Server>
-    </Servers>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+    </servers>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2</url>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-        <repository>
+    <activeProfiles>
+        <activeProfile>github</activeProfile>
+    </activeProfiles>
+
+    <profiles>
+        <profile>
             <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/maneau/fastwordssearch</url>
-        </repository>
-    </repositories>
-</Settings>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub OWNER Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/maneau/fastwordssearch</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+</settings>
