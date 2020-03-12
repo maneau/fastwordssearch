@@ -7,15 +7,18 @@ import java.util.List;
 public class WordTokenizer {
 
     private static final String AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private final String text;
     private static final boolean[] isAsciiTab = new boolean[255];
-
+    private final String text;
     private int pos = 0;
     private int start = 0;
     private int end = 0;
     private boolean openScript = false;
 
     static {
+        generateIsAsciiTable();
+    }
+
+    private static void generateIsAsciiTable() {
         Arrays.fill(isAsciiTab, false);
         String az = AZ.toLowerCase();
         for (int i = 0; i < AZ.length(); i++) {

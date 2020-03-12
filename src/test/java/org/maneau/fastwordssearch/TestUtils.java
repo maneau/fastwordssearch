@@ -85,4 +85,20 @@ public class TestUtils {
             fail(String.format("actual '%s' not present in expected", actualList.get(actualList.size() - 1)));
         }
     }
+
+    public static void assertListTokenEquals(List<Object> expectedList, List<MatchToken> actualList) {
+        assertNotNull(actualList);
+
+        for (int i = 0; i < expectedList.size() && i < actualList.size(); i++) {
+            if (!expectedList.get(i).equals(actualList.get(i))) {
+                fail(String.format("expected '%s' but found '%s'", expectedList.get(i).toString(), actualList.get(i)));
+            }
+        }
+        if (expectedList.size() > actualList.size()) {
+            fail(String.format("expected '%s' not present in actual", expectedList.get(expectedList.size() - 1)));
+        }
+        if (expectedList.size() < actualList.size()) {
+            fail(String.format("actual '%s' not present in expected", actualList.get(actualList.size() - 1)));
+        }
+    }
 }

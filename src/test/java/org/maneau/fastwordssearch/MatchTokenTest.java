@@ -23,6 +23,7 @@ public class MatchTokenTest {
         assertFalse(tokenTest1.equals(new MatchToken(2, 3, "keyword")));
         assertFalse(tokenTest1.equals(new MatchToken(1, 10, "keyword")));
         assertFalse(tokenTest1.equals(new MatchToken(1, 3, "keywords")));
+        //noinspection EqualsWithItself
         assertTrue(tokenTest1.equals(tokenTest1));
         assertFalse(tokenTest1.equals(new Object()));
     }
