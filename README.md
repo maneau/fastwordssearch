@@ -1,10 +1,10 @@
 # FastWordsSearch
 
 [![Build Status](https://travis-ci.org/maneau/fastwordssearch.svg?branch=master)](https://travis-ci.org/maneau/fastwordssearch)
+![Deploy Status](https://github.com/whelk-io/hy-phen-a-tion/workflows/deploy/badge.svg)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b3c3e839a4b34772af076cb763c67a0e)](https://www.codacy.com/manual/maneau/fastwordssearch?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=maneau/fastwordssearch&amp;utm_campaign=Badge_Grade)
 [![Codecov](https://codecov.io/gh/maneau/fastwordssearch/branch/master/graph/badge.svg)](https://codecov.io/gh/maneau/fastwordssearch)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.maneau/fastwordssearch/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.maneau/fastwordssearch)
-[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/org.maneau/fastwordssearch/badge.svg)](http://www.javadoc.io/doc/org.maneau/fastwordssearch)
+[![GitHub version](https://badge.fury.io/gh/maneau%2Ffastwordssearch.svg)](https://github.com/maneau/fastwordssearch)
 [![Apache 2](http://img.shields.io/badge/license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ## Dependency
