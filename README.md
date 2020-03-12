@@ -24,13 +24,13 @@
 
 ## Introduction
 
-Algorithm for searching multi words in text.
+A algorithm to searching keywords (multi words) in text fastly and low memory usage even with a large dictionary (1.000.000). 
 
 Inspire from [aho-corasick](https://github.com/robert-bor/aho-corasick) it works almost like it.
 
-Why creating a another ? 
+Why creating another ? 
 
-It design to be less memory greedy and as much fast as aho-corasick.
+It design to be less memory greedy and as fast as aho-corasick.
 
 How it works ?
 
