@@ -1,6 +1,12 @@
 language: java
-install: mvn install -DskipTests=true -Dgpg.skip=true
+install: mvn install -DskipTests=true
 jdk:
   - openjdk8
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+deploy:
+  provider: script
+  script: "cp .travis.settings.xml $HOME/.m2/settings.xml && mvn deploy"
+  on:
+    branch: master
+    tags: true
