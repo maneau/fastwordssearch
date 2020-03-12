@@ -9,7 +9,18 @@
 
 ## Dependency
 
-Coming soon ...
+```xml
+<repository>
+    <id>github</id>
+    <name>GitHub OWNER Apache Maven Packages</name>
+    <url>https://maven.pkg.github.com/maneau/fastwordssearch</url>
+</repository>
+<dependency>
+    <groupId>org.maneau</groupId>
+    <artifactId>fastwordssearch</artifactId>
+    <version>0.1</version>
+</dependency>
+```
 
 ## Introduction
 

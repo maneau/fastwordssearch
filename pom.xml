@@ -4,7 +4,7 @@
 
     <groupId>org.maneau</groupId>
     <artifactId>fastwordssearch</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
     <name>Fast Words Search algorithm</name>
     <description>Java library for efficient words match against a large set of multiwords keywords</description>
