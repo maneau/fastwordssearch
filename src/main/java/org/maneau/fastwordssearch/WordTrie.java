@@ -7,6 +7,7 @@ import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.maneau.fastwordssearch.WordUtils.*;
 
 @SuppressWarnings("rawtypes")
 public class WordTrie {
@@ -15,15 +16,19 @@ public class WordTrie {
 
     private final Map<String, Map> nodes = new HashMap<>();
     private boolean isIgnoreCase;
+    private boolean isIgnoreAccent;
     private Long numberOfKeywords = 0L;
 
     public void addKeyword(String keyword) {
-        if (isNotEmpty(keyword)) {
-            if (isIgnoreCase) {
-                addKeyword(nodes, keyword.toLowerCase(), keyword);
-            } else {
-                addKeyword(nodes, keyword, keyword);
+        if (hasNoText(keyword)) {
+            String transcodeKeyword = keyword;
+            if (isIgnoreAccent) {
+                transcodeKeyword = unaccent(transcodeKeyword);
             }
+            if (isIgnoreCase) {
+                transcodeKeyword = transcodeKeyword.toLowerCase();
+            }
+            addKeyword(nodes, transcodeKeyword, keyword);
         }
     }
 
@@ -35,39 +40,30 @@ public class WordTrie {
         return numberOfKeywords;
     }
 
-    protected static boolean isNotEmpty(List<String> objects) {
-        if (objects == null) {
-            return false;
-        }
-        return !objects.isEmpty();
-    }
-
     private boolean isEndOfBranch(Map<String, Map> subNode) {
         //noinspection unchecked
         return isWordFounded(subNode) && isWordFounded(subNode.get(END));
     }
 
     public List<MatchToken> parseText(final String inputText) {
-        if (isEmpty(inputText)) {
+        if (hasText(inputText)) {
             return emptyList();
         }
-        long start = 0;
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Starting parsing text of {} characters", inputText.length());
-            start = System.currentTimeMillis();
-        }
+        LOG.debug("Starting parsing text of {} characters", inputText.length());
+
         String text = inputText;
-        if (isIgnoreCase) {
-            text = inputText.toLowerCase();
+        if (isIgnoreAccent) {
+            text = unaccent(text);
         }
+        if (isIgnoreCase) {
+            text = text.toLowerCase();
+        }
+
         WordTokenizer tokenizer = new WordTokenizer(text);
         List<MatchToken> tokens = parseText(nodes, tokenizer, text);
 
-        if (LOG.isDebugEnabled()) {
-            long end = System.currentTimeMillis();
-            LOG.debug("finish parsing text of {} characters and {} keywords in {}ms",
-                    text.length(), this.numberOfKeywords, (end - start));
-        }
+        LOG.debug("finish parsing text of {} characters and {} keywords",
+                    text.length(), this.numberOfKeywords);
         return tokens;
     }
 
@@ -77,15 +73,6 @@ public class WordTrie {
 
     private String getKeywordFromNode(Map<String, Map> currentNode) {
         return (String) currentNode.get(END).keySet().iterator().next();
-    }
-
-    private boolean isNotEmpty(String word) {
-        return !isEmpty(word);
-    }
-
-    private boolean isEmpty(String word) {
-        if (word == null) return true;
-        return word.isEmpty();
     }
 
     private List<MatchToken> subParseText(final Map<String, Map> node, final WordTokenizer matcher, final int matchStartPos, int currentPos, final String text) {
@@ -110,7 +97,7 @@ public class WordTrie {
     }
 
     public void addKeywords(List<String> keywords) {
-        if (isNotEmpty(keywords)) {
+        if (isNotEmptyList(keywords)) {
             for (String keyword : keywords) {
                 addKeyword(keyword);
             }
@@ -146,7 +133,7 @@ public class WordTrie {
 
     private void addKeyword(final Map<String, Map> currentNode, final String word, final String originalKeyword) {
         LOG.debug("adding the word '{}'", word);
-        if (isEmpty(word)) {
+        if (hasText(word)) {
             //their is no words left, store the original
             Map<String, Map> allWordMap = new HashMap<>();
             allWordMap.put(originalKeyword, null);
@@ -186,16 +173,26 @@ public class WordTrie {
         this.isIgnoreCase = b;
     }
 
+    private void ignoreAccent(boolean b) {
+        this.isIgnoreAccent = b;
+    }
+
     /**
      * Inner class Builder
      */
     public static class TrieBuilder {
 
         private boolean ignoreCase = false;
+        private boolean ignoreAccent = false;
         private final Set<String> keywords = new HashSet<>();
 
         public TrieBuilder ignoreCase() {
             this.ignoreCase = true;
+            return this;
+        }
+
+        public TrieBuilder ignoreAccent() {
+            this.ignoreAccent = true;
             return this;
         }
 
@@ -204,7 +201,6 @@ public class WordTrie {
             return this;
         }
 
-        @SuppressWarnings("unused")
         public TrieBuilder addKeywords(List<String> keywordList) {
             keywords.addAll(keywordList);
             return this;
@@ -212,7 +208,10 @@ public class WordTrie {
 
         public WordTrie build() {
             WordTrie trie = new WordTrie();
+
             trie.ignoreCase(ignoreCase);
+            trie.ignoreAccent(ignoreAccent);
+
             for (String keyword : keywords) {
                 trie.addKeyword(keyword);
             }

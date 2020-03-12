@@ -78,6 +78,20 @@ assertEquals(1, tokens.size());
 assertTokenEquals(new MatchToken(21,31,"Some wordS"), tokens.get(0));
 ```
 
+### Accent Insensitive 
+
+You can need to be accent insensitive :
+```java
+WordTrie trie = WordTrie.builder().ignoreAccent()
+        .addKeyword("Déjà vu")
+        .build();
+
+List<MatchToken> tokens = trie.parseText("it's like a Déja vü");
+
+assertEquals(1, tokens.size());
+assertTokenEquals(new MatchToken(12,19,"Déjà vu"), tokens.get(0));
+```
+
 ### Still can add keywords
 
 Once build, you still can to add some keywords.

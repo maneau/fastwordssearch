@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 import static org.maneau.fastwordssearch.TestUtils.*;
@@ -32,6 +31,9 @@ public class WordTrieTest {
         trie.addKeyword("copy and paste programming");
         assertEquals(3, trie.size());
         assertEquals(2, trie.getNode("golden").size());
+
+        trie.addKeyword("copy and paste programming");
+        assertEquals("double keywords doesn't change the count", 3, trie.size());
     }
 
     @Test
@@ -46,11 +48,10 @@ public class WordTrieTest {
     }
 
     @Test
-    public void isNotEmpty_deal_with_null() {
-        //noinspection ConstantConditions
-        assertFalse(WordTrie.isNotEmpty(null));
-        assertFalse(WordTrie.isNotEmpty(emptyList()));
-        assertTrue(WordTrie.isNotEmpty(singletonList("1")));
+    public void parseText_with_null() {
+        WordTrie trie = WordTrie.builder().addKeyword("hammer").build();
+        assertTrue(trie.parseText(null).isEmpty());
+        assertTrue(trie.parseText("").isEmpty());
     }
 
     @Test
@@ -159,5 +160,24 @@ public class WordTrieTest {
         assertEquals(2, tokens.size());
         assertTokenEquals(GOLDEN_HAMMER, tokens.get(0));
         assertTokenEquals(ANALYSIS_PARALYSIS, tokens.get(1));
+    }
+
+    @Test
+    public void ignoreAccent_test() {
+        WordTrie trie = WordTrie.builder().ignoreAccent().addKeyword("déjà vu").build();
+        MatchToken expectedToken = new MatchToken(7, 14, "déjà vu");
+
+        assertListTokenEquals(singletonList(expectedToken), trie.parseText("It's a deja vù"));
+        assertTrue(trie.parseText("It's a deja Vu").isEmpty());
+    }
+
+    @Test
+    public void ignoreAccentAndCase_test() {
+        WordTrie trie = WordTrie.builder().ignoreAccent().ignoreCase().addKeyword("Déjà VÛ").build();
+        MatchToken expectedToken = new MatchToken(7, 14, "Déjà VÛ");
+
+        assertListTokenEquals(singletonList(expectedToken), trie.parseText("It's a dËJa Vù"));
+        assertListTokenEquals(singletonList(expectedToken), trie.parseText("It's a dËJa-Vù"));
+        assertTrue(trie.parseText("It's a deja not Vu").isEmpty());
     }
 }
