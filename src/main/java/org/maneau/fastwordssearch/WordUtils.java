@@ -51,11 +51,11 @@ public class WordUtils {
         return convertUNICODEmap.getOrDefault(c, c);
     }
 
-    public static boolean hasNoText(String word) {
-        return !hasText(word);
+    public static boolean hasText(String word) {
+        return !hasNoText(word);
     }
 
-    public static boolean hasText(String word) {
+    public static boolean hasNoText(String word) {
         if (word == null) return true;
         return word.isEmpty();
     }

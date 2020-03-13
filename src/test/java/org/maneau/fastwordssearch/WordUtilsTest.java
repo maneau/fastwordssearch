@@ -5,9 +5,9 @@ import org.junit.Test;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
-import static org.maneau.fastwordssearch.WordUtils.isNotEmptyList;
-import static org.maneau.fastwordssearch.WordUtils.unaccent;
+import static org.maneau.fastwordssearch.WordUtils.*;
 
+@SuppressWarnings("ConstantConditions")
 public class WordUtilsTest {
 
     private static final String accents = "È,É,Ê,Ë,Û,Ù,Ï,Î,À,Â,Ô,è,é,ê,ë,û,ù,ï,î,à,â,ô,Ç,ç,Ã,ã,Õ,õ";
@@ -43,5 +43,19 @@ public class WordUtilsTest {
         assertFalse(isNotEmptyList(null));
         assertFalse(isNotEmptyList(emptyList()));
         assertTrue(isNotEmptyList(singletonList("1")));
+    }
+
+    @Test
+    public void hasTextLimit() {
+        assertFalse(hasText(null));
+        assertFalse(hasText(""));
+        assertTrue(hasText("something"));
+    }
+
+    @Test
+    public void hasNoTextLimit() {
+        assertTrue(hasNoText(null));
+        assertTrue(hasNoText(""));
+        assertFalse(hasNoText("something"));
     }
 }
