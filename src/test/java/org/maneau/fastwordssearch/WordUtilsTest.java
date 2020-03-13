@@ -20,6 +20,11 @@ public class WordUtilsTest {
     private static final String expected3 = "Gisele Bundchen da Conceicao e Silva foi batizada assim em homenagem a sua conterranea de Horizontina, RS.";
 
     @Test
+    public void unaccentWithNull() {
+        assertNull(unaccent(null));
+    }
+
+    @Test
     public void unaccentReplaceAllAccents() {
         assertEquals(expected, unaccent(accents));
         assertEquals(expected2, unaccent(accents2));
