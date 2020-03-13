@@ -20,7 +20,7 @@ public class WordTrie {
     private Long numberOfKeywords = 0L;
 
     public void addKeyword(String keyword) {
-        if (hasNoText(keyword)) {
+        if (hasText(keyword)) {
             String transcodeKeyword = keyword;
             if (isIgnoreAccent) {
                 transcodeKeyword = unaccent(transcodeKeyword);
@@ -46,7 +46,7 @@ public class WordTrie {
     }
 
     public List<MatchToken> parseText(final String inputText) {
-        if (hasText(inputText)) {
+        if (hasNoText(inputText)) {
             return emptyList();
         }
         LOG.debug("Starting parsing text of {} characters", inputText.length());
@@ -133,7 +133,7 @@ public class WordTrie {
 
     private void addKeyword(final Map<String, Map> currentNode, final String word, final String originalKeyword) {
         LOG.debug("adding the word '{}'", word);
-        if (hasText(word)) {
+        if (hasNoText(word)) {
             //their is no words left, store the original
             Map<String, Map> allWordMap = new HashMap<>();
             allWordMap.put(originalKeyword, null);
