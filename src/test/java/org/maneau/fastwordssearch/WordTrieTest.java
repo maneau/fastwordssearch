@@ -16,7 +16,7 @@ public class WordTrieTest {
     private static final MatchToken GOLDEN_HAMMER = new MatchToken(8, 21, "golden hammer");
 
     @Test
-    public void addKeywords_with_2_and_4_levels_keywords() {
+    public void addKeywordsWith2And4LevelsKeywords() {
         WordTrie trie = new WordTrie();
         trie.addKeyword("golden hammer");
         trie.addKeyword("golden eye");
@@ -37,7 +37,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void builderAddKeywords_test() {
+    public void builderAddKeywords() {
         String[] keywords = {"golden hammer", "analysis paralysis"};
         WordTrie trie = WordTrie.builder().addKeywords(asList(keywords)).build();
         List<MatchToken> tokens = trie.parseText(basicHtmlTest);
@@ -48,14 +48,14 @@ public class WordTrieTest {
     }
 
     @Test
-    public void parseText_with_null() {
+    public void parseTextWithNull() {
         WordTrie trie = WordTrie.builder().addKeyword("hammer").build();
         assertTrue(trie.parseText(null).isEmpty());
         assertTrue(trie.parseText("").isEmpty());
     }
 
     @Test
-    public void parseText_with_1_and_2_levels_keywords() {
+    public void parseTextWith1And2LevelsKeywords() {
         WordTrie trie = WordTrie.builder().addKeyword("hammer").build();
         List<MatchToken> tokens = trie.parseText("golden hammer");
 
@@ -65,7 +65,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void parseText_with_2_and_4_level() {
+    public void parseTextWith2And4Level() {
         WordTrie trie = WordTrie.builder()
                 .addKeyword("golden hammer")
                 .addKeyword("golden eye")
@@ -80,7 +80,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void parseText_with_basic_html() {
+    public void parseTextWithBasicHtml() {
         String basicHtmlText = "<ul><li>golden hammer</li><li>analysis paralysis</li></ul>";
         WordTrie trie1 = WordTrie.builder().addKeyword("golden hammer").build();
         WordTrie trie2 = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
@@ -96,7 +96,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void parseText_with_html() {
+    public void parseTextWithHtml() {
         WordTrie trie = WordTrie.builder().ignoreCase().addKeyword("Analysis paralysis").build();
         String[] expectedKeyWord = {"Analysis paralysis"};
 
@@ -107,7 +107,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void parseText_complex_html_valid_position() {
+    public void parseTextWithComplexHtmlAndValidPosition() {
         String basicHtmlText = "<p class=\"golden hammer\">golden not hammer</p><p>golden hammer</p></li><li>analysis not paralysis</li><li>analysis paralysis</li></ul>";
         WordTrie trie = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
 
@@ -118,7 +118,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void parseText_with_large_html_page() {
+    public void parseTextWithLargeHtmlPage() {
         WordTrie trie = WordTrie.builder().ignoreCase()
                 .addKeyword("Analysis paralysis")
                 .addKeyword("Bicycle shed")
@@ -141,7 +141,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void parseText_simple_html_valid_position() {
+    public void parseTextSimpleHtmlAndValidPosition() {
         WordTrie trie = WordTrie.builder().addKeyword("golden hammer").addKeyword("analysis paralysis").build();
 
         List<MatchToken> tokens = trie.parseText(basicHtmlTest);
@@ -151,7 +151,7 @@ public class WordTrieTest {
     }
 
     @Test
-    public void addkeywords_test() {
+    public void addkeywordsVerify() {
         String[] keywords = {"golden hammer", "analysis paralysis"};
         WordTrie trie = WordTrie.builder().build();
         trie.addKeywords(asList(keywords));
@@ -163,21 +163,21 @@ public class WordTrieTest {
     }
 
     @Test
-    public void ignoreAccent_test() {
+    public void ignoreAccentVerify() {
         WordTrie trie = WordTrie.builder().ignoreAccent().addKeyword("déjà vu").build();
         MatchToken expectedToken = new MatchToken(7, 14, "déjà vu");
 
-        assertListTokenEquals(singletonList(expectedToken), trie.parseText("It's a deja vù"));
+        assertListEquals(singletonList(expectedToken), trie.parseText("It's a deja vù"));
         assertTrue(trie.parseText("It's a deja Vu").isEmpty());
     }
 
     @Test
-    public void ignoreAccentAndCase_test() {
+    public void ignoreAccentAndCase() {
         WordTrie trie = WordTrie.builder().ignoreAccent().ignoreCase().addKeyword("Déjà VÛ").build();
         MatchToken expectedToken = new MatchToken(7, 14, "Déjà VÛ");
 
-        assertListTokenEquals(singletonList(expectedToken), trie.parseText("It's a dËJa Vù"));
-        assertListTokenEquals(singletonList(expectedToken), trie.parseText("It's a dËJa-Vù"));
+        assertListEquals(singletonList(expectedToken), trie.parseText("It's a dËJa Vù"));
+        assertListEquals(singletonList(expectedToken), trie.parseText("It's a dËJa-Vù"));
         assertTrue(trie.parseText("It's a deja not Vu").isEmpty());
     }
 }

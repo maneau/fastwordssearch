@@ -18,7 +18,7 @@ public class MatchTokenTest {
 
     @SuppressWarnings("SimplifiableJUnitAssertion")
     @Test
-    public void testEquals() {
+    public void equalsVerify() {
         assertTokenEquals(new MatchToken(1, 3, "keyword"), tokenTest1);
         assertFalse(tokenTest1.equals(new MatchToken(2, 3, "keyword")));
         assertFalse(tokenTest1.equals(new MatchToken(1, 10, "keyword")));
@@ -29,7 +29,7 @@ public class MatchTokenTest {
     }
 
     @Test
-    public void testHashCode() {
+    public void hashCodeVerify() {
         assertEquals(Objects.hash(1, 3, "keyword"), tokenTest1.hashCode());
         assertNotSame(Objects.hash(2, 3, "keyword"), tokenTest1.hashCode());
         assertNotSame(Objects.hash(1, 4, "keyword"), tokenTest1.hashCode());
@@ -37,7 +37,7 @@ public class MatchTokenTest {
     }
 
     @Test
-    public void testGetKeyword() {
+    public void getKeywordVerify() {
         assertEquals("keyword", tokenTest1.getKeyword());
     }
 }

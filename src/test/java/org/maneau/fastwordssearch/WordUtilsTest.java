@@ -5,6 +5,7 @@ import org.junit.Test;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
+import static org.maneau.fastwordssearch.WordUtils.isNotEmptyList;
 import static org.maneau.fastwordssearch.WordUtils.unaccent;
 
 public class WordUtilsTest {
@@ -19,23 +20,23 @@ public class WordUtilsTest {
     private static final String expected3 = "Gisele Bundchen da Conceicao e Silva foi batizada assim em homenagem a sua conterranea de Horizontina, RS.";
 
     @Test
-    public void isNotEmpty_deal_with_null() {
-        //noinspection ConstantConditions
-        assertFalse(WordUtils.isNotEmptyList(null));
-        assertFalse(WordUtils.isNotEmptyList(emptyList()));
-        assertTrue(WordUtils.isNotEmptyList(singletonList("1")));
-    }
-
-    @Test
-    public void replacingAllAccents() {
+    public void unaccentReplaceAllAccents() {
         assertEquals(expected, unaccent(accents));
         assertEquals(expected2, unaccent(accents2));
         assertEquals(expected3, unaccent(accents3));
     }
 
     @Test
-    public void noReplacingSpecialChar() {
+    public void unaccentDoesntReplacingSpecialChar() {
         String special = "hello world! LİKE";
         assertEquals(special, unaccent(special));
+    }
+
+    @Test
+    public void isNotEmptyWithNull() {
+        //noinspection ConstantConditions
+        assertFalse(isNotEmptyList(null));
+        assertFalse(isNotEmptyList(emptyList()));
+        assertTrue(isNotEmptyList(singletonList("1")));
     }
 }

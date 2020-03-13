@@ -26,7 +26,7 @@ public class BenchTest {
     private final Random rand = new Random();
 
     @Test
-    public void testLoadFastWordSearch() {
+    public void benchFastWordSearch() {
         WordTrie wordTrie;
         for (int nb : trieSizes) {
             long start = System.currentTimeMillis();
@@ -57,7 +57,7 @@ public class BenchTest {
     }
 
     @Test
-    public void testLoadAho() {
+    public void benchAhoCorasick() {
         for (int nb : trieSizes) {
             long start = System.currentTimeMillis();
             Trie trie = createNbelementDicoAho(nb);

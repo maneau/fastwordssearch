@@ -10,7 +10,7 @@ import static org.maneau.fastwordssearch.TestUtils.assertTokenEquals;
 public class ReadmeTest {
 
     @Test
-    public void test_basic() {
+    public void basicUsage() {
         WordTrie trie = WordTrie.builder()
                 .addKeyword("some words")
                 .build();
@@ -21,7 +21,7 @@ public class ReadmeTest {
     }
 
     @Test
-    public void test_ignoreCase() {
+    public void caseInsensitive() {
         WordTrie trie = WordTrie.builder().ignoreCase()
                 .addKeyword("Some wordS")
                 .build();
@@ -33,7 +33,19 @@ public class ReadmeTest {
     }
 
     @Test
-    public void test_post_addkeywords() {
+    public void accentInsensitive () {
+        WordTrie trie = WordTrie.builder().ignoreAccent()
+                .addKeyword("Déjà vu")
+                .build();
+
+        List<MatchToken> tokens = trie.parseText("it's like a Déja vü");
+
+        assertEquals(1, tokens.size());
+        assertTokenEquals(new MatchToken(12,19,"Déjà vu"), tokens.get(0));
+    }
+
+    @Test
+    public void addKeywordsAfterBuild() {
         WordTrie trie = WordTrie.builder().ignoreCase()
                 .addKeyword("some words")
                 .build();
@@ -47,7 +59,7 @@ public class ReadmeTest {
     }
 
     @Test
-    public void test_ignore_specialchars() {
+    public void ignoringSpecialCharactersAndPonctuation() {
         WordTrie trie = WordTrie.builder()
                 .addKeyword("some words")
                 .build();
@@ -59,7 +71,7 @@ public class ReadmeTest {
     }
 
     @Test
-    public void test_ignore_html_tag() {
+    public void ignoringHtmlTags() {
         WordTrie trie = WordTrie.builder()
                 .addKeyword("some words")
                 .build();
