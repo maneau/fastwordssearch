@@ -4,7 +4,7 @@
 
     <groupId>org.maneau</groupId>
     <artifactId>fastwordssearch</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
     <name>Fast Words Search</name>
     <description>Java library for efficient multi-words keywords searching on a text.</description>

@@ -4,7 +4,7 @@
 ![Deploy Status](https://github.com/whelk-io/hy-phen-a-tion/workflows/deploy/badge.svg)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b3c3e839a4b34772af076cb763c67a0e)](https://www.codacy.com/manual/maneau/fastwordssearch?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=maneau/fastwordssearch&amp;utm_campaign=Badge_Grade)
 [![Codecov](https://codecov.io/gh/maneau/fastwordssearch/branch/master/graph/badge.svg)](https://codecov.io/gh/maneau/fastwordssearch)
-[![Apache 2](http://img.shields.io/badge/license-Apache%202-blue.svg)](http://www.apach e.org/licenses/LICENSE-2.0)
+[![Apache 2](http://img.shields.io/badge/license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ## Dependency
 
@@ -17,7 +17,7 @@
 <dependency>
     <groupId>org.maneau</groupId>
     <artifactId>fastwordssearch</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
 </dependency>
 ```
 
