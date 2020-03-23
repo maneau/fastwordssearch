@@ -44,7 +44,7 @@ public class BenchTest {
 
             for (int i = 0; i < NB_SEARCH; i++) {
                 tokens = wordTrie.parseText(wikipediaHtml);
-                assertEquals(7, tokens.size());
+                assertEquals(9, tokens.size());
             }
             end = System.currentTimeMillis();
             LOG.info("Using WordTrie search {} terms in {} docs during {}ms. With a dictionnary containing {} elements",

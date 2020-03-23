@@ -9,17 +9,17 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.maneau.fastwordssearch.WordUtils.*;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class WordTrie {
     private static final Logger LOG = LoggerFactory.getLogger(WordTrie.class);
     private static final String END = "§";
-
+    private final WordTokenizer KEYWORD_TOKENIZER = WordTokenizer.builder().build();
     private final Map<String, Map> nodes = new HashMap<>();
     private boolean isIgnoreCase;
     private boolean isIgnoreAccent;
     private Long numberOfKeywords = 0L;
 
-    public void addKeyword(String keyword) {
+    public void addKeyword(final String keyword) {
         if (hasText(keyword)) {
             String transcodeKeyword = keyword;
             if (isIgnoreAccent) {
@@ -28,7 +28,7 @@ public class WordTrie {
             if (isIgnoreCase) {
                 transcodeKeyword = transcodeKeyword.toLowerCase();
             }
-            addKeyword(nodes, transcodeKeyword, keyword);
+            storeKeyword(transcodeKeyword, keyword);
         }
     }
 
@@ -42,7 +42,7 @@ public class WordTrie {
 
     private boolean isEndOfBranch(Map<String, Map> subNode) {
         //noinspection unchecked
-        return isWordFounded(subNode) && isWordFounded(subNode.get(END));
+        return isWordFound(subNode) && isWordFound(subNode.get(END));
     }
 
     public List<MatchToken> parseText(final String inputText) {
@@ -59,7 +59,7 @@ public class WordTrie {
             text = text.toLowerCase();
         }
 
-        WordTokenizer tokenizer = new WordTokenizer(text);
+        WordTokenizer tokenizer = WordTokenizer.builder().ignoreAccent(isIgnoreAccent).build().tokenize(text);
         List<MatchToken> tokens = parseText(nodes, tokenizer, text);
 
         LOG.debug("finish parsing text of {} characters and {} keywords",
@@ -67,7 +67,7 @@ public class WordTrie {
         return tokens;
     }
 
-    private boolean isWordFounded(Map<String, Map> subNode) {
+    private boolean isWordFound(Map<String, Map> subNode) {
         return subNode != null;
     }
 
@@ -88,9 +88,9 @@ public class WordTrie {
                 String matchStr = getKeywordFromNode(subNode);
                 LOG.debug("find '{}' at ({},{}) position", matchStr, matchStartPos, endPos);
                 return singletonList(new MatchToken(matchStartPos, endPos, matchStr));
-            } else if (isWordFounded(subNode)) {
+            } else if (isWordFound(subNode)) {
                 //Search descending in the tree
-                return subParseText(subNode, matcher, startPos, endPos, text);
+                return subParseText(subNode, matcher, matchStartPos, endPos, text);
             }
         }
         return emptyList();
@@ -122,7 +122,7 @@ public class WordTrie {
                 String matchStr = getKeywordFromNode(subNode);
                 LOG.debug("find '{}' at ({},{}) position", matchStr, startPos, endPos);
                 tokens.add(new MatchToken(startPos, endPos, matchStr));
-            } else if (isWordFounded(subNode)) {
+            } else if (isWordFound(subNode)) {
                 //Search descending in the tree
                 tokens.addAll(subParseText(subNode, matcher, startPos, endPos, text));
             }
@@ -131,36 +131,30 @@ public class WordTrie {
         return tokens;
     }
 
-    private void addKeyword(final Map<String, Map> currentNode, final String word, final String originalKeyword) {
-        LOG.debug("adding the word '{}'", word);
-        if (hasNoText(word)) {
-            //their is no words left, store the original
-            Map<String, Map> allWordMap = new HashMap<>();
-            allWordMap.put(originalKeyword, null);
+    private void storeKeyword(final String keyword, final String originalKeyword) {
+        LOG.debug("Storin the keyword '{}'", keyword);
+        Map<String, Map> currentNode = nodes;
+        if (hasText(keyword)) {
+            WordTokenizer wordTokenizer = KEYWORD_TOKENIZER.tokenize(keyword);
+
+            while (wordTokenizer.find()) {
+                currentNode = currentNode.computeIfAbsent(wordTokenizer.getToken(), k -> new HashMap<String, Map>());
+            }
 
             if (!currentNode.containsKey(END)) {
-                currentNode.put(END, allWordMap);
+                //their is no words left, store the original
+                currentNode.put(END, generateKeywordEnd(originalKeyword));
                 numberOfKeywords++;
             } else {
                 LOG.debug("Keyword '{}' already in dictionary", originalKeyword);
             }
-        } else {
-            //split the word if you can
-            int indexFinMot = word.indexOf(" ");
-            if (indexFinMot == -1) {
-                indexFinMot = word.length();
-            }
-
-            String currentWord = word.substring(0, indexFinMot);
-            String restOfWord = null;
-            if (indexFinMot < word.length()) {
-                restOfWord = word.substring(indexFinMot + 1);
-            }
-
-            @SuppressWarnings("unchecked") Map<String, Map> subNode = currentNode.computeIfAbsent(currentWord, k -> new HashMap<>());
-            //recurs call
-            addKeyword(subNode, restOfWord, originalKeyword);
         }
+    }
+
+    private Map<String, Map> generateKeywordEnd(String originalKeyword) {
+        Map<String, Map> allWordMap = new HashMap<>();
+        allWordMap.put(originalKeyword, null);
+        return allWordMap;
     }
 
     @SuppressWarnings("SameParameterValue")

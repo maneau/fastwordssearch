@@ -75,8 +75,24 @@ public class WordTrieTest {
         assertEquals(3, trie.size());
         List<MatchToken> tokens = trie.parseText("the movie golden eye is great. But don't copy of copy and paste programming");
         assertEquals(2, tokens.size());
-        assertTokenEquals(new MatchToken(10,20, "golden eye"),tokens.get(0));
-        assertTokenEquals(new MatchToken(58,75, "copy and paste programming"),tokens.get(1));
+        assertTokenEquals(new MatchToken(10, 20, "golden eye"), tokens.get(0));
+        assertTokenEquals(new MatchToken(49, 75, "copy and paste programming"), tokens.get(1));
+    }
+
+    @Test
+    public void parseTextWithMinus() {
+        WordTrie trie = WordTrie.builder()
+                .addKeyword("golden-hammer")
+                .addKeyword("golden eye")
+                .addKeyword("copy-and-paste-programming")
+                .build();
+
+        assertEquals(3, trie.size());
+        List<MatchToken> tokens = trie.parseText("golden hammer golden-eye copy-and-paste-programming");
+        assertEquals(3, tokens.size());
+        assertTokenEquals(new MatchToken(0, 13, "golden-hammer"), tokens.get(0));
+        assertTokenEquals(new MatchToken(14, 24, "golden eye"), tokens.get(1));
+        assertTokenEquals(new MatchToken(25, 51, "copy-and-paste-programming"), tokens.get(2));
     }
 
     @Test
@@ -130,14 +146,16 @@ public class WordTrieTest {
                 .build();
 
         List<MatchToken> tokens = trie.parseText(wikipediaHtml);
-        assertEquals(7, tokens.size());
+        assertEquals(9, tokens.size());
         assertTokenEquals(new MatchToken(1571, 1589, "Analysis paralysis"), tokens.get(0));
-        assertTokenEquals(new MatchToken(7136, 7154, "Analysis paralysis"), tokens.get(1));
-        assertTokenEquals(new MatchToken(7393, 7405, "Bicycle shed"), tokens.get(2));
-        assertTokenEquals(new MatchToken(10126, 10134, "Stovepipe or Silos"), tokens.get(3));
-        assertTokenEquals(new MatchToken(12450, 12461, "Smoke and mirrors"), tokens.get(4));
-        assertTokenEquals(new MatchToken(24355, 24372, "Copy and paste programming"), tokens.get(5));
-        assertTokenEquals(new MatchToken(25157, 25170, "Golden hammer"), tokens.get(6));
+        assertTokenEquals(new MatchToken(1943, 1957, "Vendor lock-in"), tokens.get(1));
+        assertTokenEquals(new MatchToken(7136, 7154, "Analysis paralysis"), tokens.get(2));
+        assertTokenEquals(new MatchToken(7393, 7405, "Bicycle shed"), tokens.get(3));
+        assertTokenEquals(new MatchToken(10116, 10134, "Stovepipe or Silos"), tokens.get(4));
+        assertTokenEquals(new MatchToken(10669, 10683, "Vendor lock-in"), tokens.get(5));
+        assertTokenEquals(new MatchToken(12444, 12461, "Smoke and mirrors"), tokens.get(6));
+        assertTokenEquals(new MatchToken(24346, 24372, "Copy and paste programming"), tokens.get(7));
+        assertTokenEquals(new MatchToken(25157, 25170, "Golden hammer"), tokens.get(8));
     }
 
     @Test
